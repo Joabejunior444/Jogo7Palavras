@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>7 Palavras</title>
+<link rel="icon" href="assets/favicon.ico?v=3" sizes="32x32">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/sete-palavras.css">
+</head>
+<body>
+<main class="app">
+
+  <section id="screen-home" class="screen active">
+    <div class="logo"><span class="seven">7</span><span class="pal">Palavras</span></div>
+    <p class="tag">Uma palavra de dica. Uma chance de acertar.</p>
+    <div class="fan" aria-hidden="true"><span>dica</span><span>chute</span><span>ponto</span></div>
+    <div class="col">
+      <button class="btn yellow big" onclick="GameApp.navigate('screen-setup')">Iniciar jogo</button>
+      <button class="btn" onclick="GameApp.navigate('screen-rules')">Como jogar</button>
+      <button class="btn ghost snd" onclick="GameApp.toggleSound()">Som: ligado</button>
+    </div>
+    <p class="muted center" id="home-stats"></p>
+  </section>
+
+  <section id="screen-rules" class="screen">
+    <div class="box">
+      <h2>Como jogar</h2>
+      <ol class="rules">
+        <li>Monte a partida: nomes das equipes, dificuldade, categoria, rodadas e tempo.</li>
+        <li>Só o Mestre olha a tela. Ele escolhe uma das 7 palavras e dá <b>uma única palavra</b> de dica.</li>
+        <li>As equipes têm uma chance de adivinhar a palavra escolhida.</li>
+        <li>O Mestre toca na palavra e marca quem acertou, ninguém, ou troca a palavra por outra.</li>
+        <li>Cada palavra vale pontos pelo nível: fácil 1, médio 2, difícil 3.</li>
+        <li>Ao fim das rodadas, vence quem tiver mais pontos. Empatou? Dá para jogar mais uma rodada.</li>
+      </ol>
+      <button class="btn" onclick="GameApp.navigate('screen-home')">Voltar</button>
+    </div>
+  </section>
+
+  <section id="screen-setup" class="screen">
+    <div class="box">
+      <h2>Montar partida</h2>
+      <div class="row2">
+        <label class="f">Equipe azul<input id="input-team-a" maxlength="15" placeholder="Ex: Os Vingadores" autocomplete="off"></label>
+        <label class="f">Equipe laranja<input id="input-team-b" maxlength="15" placeholder="Ex: Liga da Justiça" autocomplete="off"></label>
+      </div>
+      <div class="f"><span class="lab">Dificuldade</span>
+        <div class="seg" data-k="diff">
+          <button data-v="facil">Fácil<small>1 ponto</small></button>
+          <button data-v="medio">Médio<small>2 pontos</small></button>
+          <button data-v="dificil">Difícil<small>3 pontos</small></button>
+          <button data-v="misto">Misto<small>de 1 a 3</small></button>
+        </div>
+      </div>
+      <div class="f"><span class="lab">Categoria</span><div class="seg cats" data-k="cat" id="seg-cat"></div></div>
+      <div class="f"><span class="lab">Rodadas</span>
+        <div class="seg" data-k="rounds">
+          <button data-v="1">1</button><button data-v="3">3</button><button data-v="5">5</button><button data-v="10">10</button>
+        </div>
+      </div>
+      <div class="f"><span class="lab">Tempo por rodada</span>
+        <div class="seg" data-k="time">
+          <button data-v="0">Livre</button><button data-v="60">1 min</button><button data-v="90">1min30</button><button data-v="120">2 min</button>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="GameApp.navigate('screen-home')">Voltar</button>
+        <button class="btn yellow" onclick="GameApp.startMatch()">Bora jogar</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-game" class="screen">
+    <header class="hud">
+      <div class="team A"><b id="hud-name-a"></b><strong id="hud-score-a">0</strong></div>
+      <div class="mid"><span id="hud-round"></span><span id="hud-timer" class="timer" hidden></span></div>
+      <div class="team B"><b id="hud-name-b"></b><strong id="hud-score-b">0</strong></div>
+    </header>
+    <div id="board" class="board"></div>
+    <div class="col">
+      <button class="btn blue" id="btn-next" onclick="GameApp.next()">Próxima rodada</button>
+      <button class="btn yellow" id="btn-add" onclick="GameApp.addRound()" hidden>Mais uma rodada</button>
+      <div class="row">
+        <button class="btn ghost snd" onclick="GameApp.toggleSound()">Som: ligado</button>
+        <button class="btn ghost" id="btn-abort" onclick="GameApp.abort()">Encerrar partida</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-victory" class="screen">
+    <div class="box center">
+      <p class="muted">Fim de jogo</p>
+      <h1 id="victory-team" class="vtitle"></h1>
+      <div class="final"><span class="A" id="final-a">0</span><span class="x">x</span><span class="B" id="final-b">0</span></div>
+      <div class="stats" id="stats"></div>
+      <div class="log-title">Resumo das palavras</div>
+      <div class="log" id="log" role="table" aria-label="Resumo das palavras"></div>
+      <button class="btn yellow" id="btn-copy-result" onclick="GameApp.copyResult()">Copiar resultado</button>
+      <div class="row">
+        <button class="btn" onclick="GameApp.navigate('screen-home')">Início</button>
+        <button class="btn yellow" onclick="GameApp.startMatch(true)">Revanche</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="modal" class="overlay" onclick="if(event.target===this)GameApp.close()">
+  <div class="sheet">
+    <p class="muted center" id="modal-lv"></p>
+    <p class="muted center" id="swap-hint" hidden>Ao trocar, a palavra vira média (amarela) e passa a valer 2 pontos.</p>
+    <h3 id="modal-word" class="target"></h3>
+    <div class="vote">
+      <button class="btn blue" onclick="GameApp.resolve('A')">Azul acertou</button>
+      <button class="btn orange" onclick="GameApp.resolve('B')">Laranja acertou</button>
+      <button class="btn" onclick="GameApp.resolve('skip')">Ninguém acertou</button>
+      <button class="btn" id="btn-swap" onclick="GameApp.swap()">Trocar palavra</button>
+    </div>
+    <button class="btn ghost" onclick="GameApp.close()">Fechar</button>
+  </div>
+</div>
+
+<script src="js/banco-palavras.js"></script>
+<script src="js/sete-palavras.js"></script>
+</body>
+</html>
